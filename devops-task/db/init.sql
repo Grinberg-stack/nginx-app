@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS counter (
     count INT NOT NULL DEFAULT 0
 );
 
--- ודא שהמונה מתחיל מ-0 אם לא קיים
+
 INSERT INTO counter (id, count)
 SELECT 1, 0
 WHERE NOT EXISTS (SELECT 1 FROM counter WHERE id=1);
