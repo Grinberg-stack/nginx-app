@@ -2,56 +2,56 @@ version: '3.8'
 
 services:
   nginx:
-    image: nginx:latest
-    container_name: nginx_lb
+    image: nginx:latest  # Use the latest Nginx image
+    container_name: nginx_lb  # Name the container
     ports:
-      - "80:80"
+      - "80:80"  # Map port 80 of the host to port 80 of the container
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro  # Mount Nginx configuration file as read-only
     depends_on:
-      - app
+      - app  # Ensure app starts before Nginx
     networks:
-      - app_network
+      - app_network  # Connect to the application network
 
   db:
-    image: mysql:latest
-    container_name: mysql_db
-    restart: always
+    image: mysql:latest  # Use the latest MySQL image
+    container_name: mysql_db  # Name the container
+    restart: always  # Restart on failure
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: app_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword  # Set MySQL root password
+      MYSQL_DATABASE: app_db  # Create default database
+      MYSQL_USER: user  # Create user
+      MYSQL_PASSWORD: password  # Set user password
     ports:
-      - "3306:3306"
+      - "3306:3306"  # Map MySQL port
     volumes:
-      - db_data:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data:/var/lib/mysql  # Store MySQL data persistently
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql  # Initialize database on startup
     networks:
-      - app_network
+      - app_network  # Connect to application network
 
   app:
     build:
-      context: ./app
-      dockerfile: Dockerfile
+      context: ./app  # Use the Dockerfile inside the "app" directory
+      dockerfile: Dockerfile  # Specify the Dockerfile
     deploy:
-      replicas: 3
+      replicas: 3  # Run 3 instances of the app
     environment:
-      MYSQL_HOST: db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_DB: app_db
+      MYSQL_HOST: db  # Connect app to the database container
+      MYSQL_USER: user  # Database user
+      MYSQL_PASSWORD: password  # Database password
+      MYSQL_DB: app_db  # Database name
     volumes:
-      - app_logs:/app/logs
+      - app_logs:/app/logs  # Store logs persistently
     networks:
-      - app_network
+      - app_network  # Connect to application network
     depends_on:
-      - db
+      - db  # Ensure database starts before the app
 
 networks:
   app_network:
-    driver: bridge
+    driver: bridge  # Use bridge network for communication
 
 volumes:
-  db_data:
-  app_logs:
+  db_data:  # Volume for database storage
+  app_logs:  # Volume for application logs
